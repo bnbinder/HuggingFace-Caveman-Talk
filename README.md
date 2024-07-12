@@ -35,11 +35,7 @@ And run this in an admin access terminal
 Set-ExecutionPolicy -ExecutionPolicy Undefined
 ```
 
-
-
-
-
-
+# Sources and Help
 https://code.visualstudio.com/docs/python/environments
 
 https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.4
