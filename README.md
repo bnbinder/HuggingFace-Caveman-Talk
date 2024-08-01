@@ -23,6 +23,7 @@ make sure you have pip 3.12.4 or higher cuz it complains
 
 and install these libraries
 ```
+pip install accelerate (if using low_cpu_mem_usage=true parameter when loading pretrained model ig????????!!! WHY CANT YOU JUST USE LITTLE MEMORY AT TIME >:(                  
 pip install transformers==4.21.0
 pip install datasets scikit-learn sentencepiece streamlit seqeval tensorboardx wandb psutil
 pip install SpaCy ftfy
