@@ -6,7 +6,7 @@ import torch
 # Load pretrained ConvBERT model and tokenizer
 model_name = "bert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForMaskedLM.from_pretrained(model_name)
+model = AutoModelForMaskedLM.from_pretrained(model_name, low_cpu_mem_usage=True, device_map="cpu")
 
 def generate_text(prompt, max_length=50, num_return_sequences=1):
     inputs = tokenizer(prompt, return_tensors="pt", truncation=True, padding=True)

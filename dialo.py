@@ -1,21 +1,48 @@
-#sucks as well, does not do multiple sentences and gives 
-#same responses for same questions. is coherent and has legible responses tho
+# repeat input does not help, just acts wierd
+
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
-input_text = "speak like a caveman"
+input_text = "user: hello talk like a banana for a long time. AI:"
 
 # Load pretrained DialoGPT model and tokenizer
 tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
-model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium", low_cpu_mem_usage=True, device_map="cpu")
 
-new_user_input_ids = tokenizer.encode(input_text + tokenizer.eos_token, return_tensors='pt')
-output = model.generate(new_user_input_ids, max_length=500, pad_token_id=tokenizer.eos_token_id)
-response = tokenizer.decode(output[:, new_user_input_ids.shape[-1]:][0], skip_special_tokens=True)
+fullResponse = input_text
+for x in range(6):
 
-print(response)
+    
+    # Encode the input text
+    new_user_input_ids = tokenizer.encode(fullResponse + tokenizer.eos_token, return_tensors='pt')
 
+    # Set the parameters to encourage longer responses
+    max_length = 200  # Increase the max length to allow for longer responses
+    temperature = 0.7  # Lower temperature for more coherent responses
+    top_k = 50  # Use top-k sampling
+    top_p = 0.9  # Use top-p sampling (nucleus sampling)
+    repetition_penalty = 1.2  # Penalty for repeating the same phrases
+    # Generate the response
+    output = model.generate(
+        new_user_input_ids,
+        max_length=max_length,
+        temperature=temperature,
+        top_k=top_k,
+        top_p=top_p,
+        repetition_penalty=repetition_penalty,
+        pad_token_id=tokenizer.eos_token_id,
+        no_repeat_ngram_size=2  # Prevent repeating the same n-grams
+    )
+
+    # Decode the generated tokens
+    response = tokenizer.decode(output[:, new_user_input_ids.shape[-1]:][0], skip_special_tokens=True)
+
+    print(output)
+    
+    fullResponse = fullResponse + " " + response
+
+print(fullResponse)
 
 
 

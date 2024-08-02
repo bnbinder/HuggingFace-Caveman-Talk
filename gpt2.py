@@ -13,7 +13,7 @@ torch.manual_seed(seed)
 
 # Load pretrained GPT-2 model and tokenizer
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-model = GPT2LMHeadModel.from_pretrained('gpt2')
+model = GPT2LMHeadModel.from_pretrained('gpt2', low_cpu_mem_usage=True, device_map="cpu")
 
 max_length=50 # Adjust the max_length to a smaller value
 num_return_sequences=1

@@ -20,7 +20,7 @@ mistral_models_path = Path.home().joinpath('mistral_models', 'Nemo-Instruct')
 mistral_models_path.mkdir(parents=True, exist_ok=True)
 
 # Replace 'your_huggingface_token' with your actual token
-login(token=':)))')
+login(token='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')
 
 # Load the tokenizer and model from Hugging Face
 from transformers import AutoTokenizer, AutoModelForCausalLM
