@@ -2,7 +2,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from accelerate import init_empty_weights, load_checkpoint_and_dispatch
 import torch
 
-# Initialize the tokenizer
+#Initialize the tokenizer
 try:
     print("Loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3.1-70B")
