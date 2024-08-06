@@ -2,18 +2,17 @@ import torch
 import transformers
 from huggingface_hub import login
 
+login("eee")
+
 class Llama3:
-    login("eeee")
     def __init__(self, model_path):
         self.model_id = model_path
-        self.device = -1
         self.pipeline = transformers.pipeline(
             "text-generation",
             model=self.model_id,
             model_kwargs={
-                "torch_dtype": torch.float32
+                "torch_dtype": torch.float16,
             },
-            device=self.device,
         )
         self.terminators = [
             self.pipeline.tokenizer.eos_token_id,
@@ -46,11 +45,8 @@ class Llama3:
                 print("Exiting the chatbot. Goodbye!")
                 break
             response, conversation = self.get_response(user_input, conversation)
-            print(conversation)
             print(f"Assistant: {response}")
   
 if __name__ == "__main__":
     bot = Llama3("meta-llama/Meta-Llama-3-8B-Instruct")
     bot.chatbot()
-    
-    
