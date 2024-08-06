@@ -3,23 +3,30 @@ import transformers
 from huggingface_hub import login
 
 class Llama3:
-    def __init__(self, model_path, api_key):
-        # Log in to Hugging Face using the API key
-        login(api_key)
-        
+    login("eeee")
+    def __init__(self, model_path):
         self.model_id = model_path
+        self.device = -1
         self.pipeline = transformers.pipeline(
             "text-generation",
             model=self.model_id,
-            model_kwargs={"torch_dtype": torch.float16},  # No quantization
-)
-
+            model_kwargs={
+                "torch_dtype": torch.float32
+            },
+            device=self.device,
+        )
         self.terminators = [
             self.pipeline.tokenizer.eos_token_id,
             self.pipeline.tokenizer.convert_tokens_to_ids(""),
         ]
-
-    def get_response(self, prompt, max_tokens=4096, temperature=0.6, top_p=0.9):
+  
+    def get_response(
+          self, query, message_history=[], max_tokens=4096, temperature=0.6, top_p=0.9
+      ):
+        user_prompt = message_history + [{"role": "user", "content": query}]
+        prompt = self.pipeline.tokenizer.apply_chat_template(
+            user_prompt, tokenize=False, add_generation_prompt=True
+        )
         outputs = self.pipeline(
             prompt,
             max_new_tokens=max_tokens,
@@ -28,14 +35,22 @@ class Llama3:
             temperature=temperature,
             top_p=top_p,
         )
-        response = outputs[0]["generated_text"]
-        return response
-
+        response = outputs[0]["generated_text"][len(prompt):]
+        return response, user_prompt + [{"role": "assistant", "content": response}]
+    
+    def chatbot(self, system_instructions=""):
+        conversation = [{"role": "system", "content": system_instructions}]
+        while True:
+            user_input = input("User: ")
+            if user_input.lower() in ["exit", "quit"]:
+                print("Exiting the chatbot. Goodbye!")
+                break
+            response, conversation = self.get_response(user_input, conversation)
+            print(conversation)
+            print(f"Assistant: {response}")
+  
 if __name__ == "__main__":
-    api_key = "hihiihihihi"
-    model_path = "meta-llama/Meta-Llama-3-8B-Instruct"
-    prompt = "Hello, how can I assist you today?"
-
-    bot = Llama3(model_path, api_key)
-    response = bot.get_response(prompt)
-    print(f"Response: {response}")
+    bot = Llama3("meta-llama/Meta-Llama-3-8B-Instruct")
+    bot.chatbot()
+    
+    

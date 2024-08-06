@@ -33,6 +33,15 @@ pip3 install torch torchvision torchaudio --index-url https://download.pytorch.o
 pip install simpletransformers==0.61.13 (NOT USING THIS, HERE FOR AUTHOR TO REMEMBER VERSION THAT IS SUPPOSED TO WORK!!!!!!!!!!!!!!!) 
 ```
 
+pip install bitsandbytes
+pip install -U "huggingface_hub[cli]"
+pip install accelerate                
+pip install transformers==4.21.0
+pip install datasets scikit-learn sentencepiece streamlit seqeval tensorboardx wandb psutil
+pip install SpaCy ftfy
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install simpletransformers==0.61.13
+
 Once your done running your code, run this in a terminal inside your repository folder
 ```
 venv_name/Scripts/deactivate
@@ -51,3 +60,5 @@ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/ab
 https://github.com/huggingface/optimum/issues/344
 
 https://stackoverflow.com/questions/8949252/why-do-i-get-attributeerror-nonetype-object-has-no-attribute-something
+
+https://medium.com/@manuelescobar-dev implementing-and-running-llama-3-with-hugging-faces-transformers-library-40e9754d8c80
