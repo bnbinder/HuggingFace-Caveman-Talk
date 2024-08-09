@@ -3,7 +3,7 @@ import transformers
 from huggingface_hub import login
 import spacy
 
-login("hhhhhh")
+login("hhhhh")
 nlp = spacy.load("en_core_web_sm")
 class Llama3:
     def __init__ (self, modelPath):
