@@ -2,7 +2,7 @@ import torch
 import transformers
 from huggingface_hub import login
 
-login("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")
+login("this token is deleted dont even try")
 
 class Llama3:
     def __init__(self, model_path):
