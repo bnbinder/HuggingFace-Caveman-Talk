@@ -25,6 +25,8 @@ make sure you have pip 3.12.4 or higher cuz it complains
 
 and install these libraries
 ```
+pip install spacy
+python -m spacy download en_core_web_sm
 pip install wheel
 pip install ninja (idk)
 pip install packaging (idk)

@@ -23,6 +23,8 @@ https://developer.nvidia.com/cuda-toolkit
 
 and install these libraries
 ```
+pip install spacy
+python -m spacy download en_core_web_sm
 pip install bitsandbytes
 pip install -U "huggingface_hub[cli]"
 pip install accelerate
