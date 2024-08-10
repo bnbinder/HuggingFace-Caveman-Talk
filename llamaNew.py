@@ -3,8 +3,9 @@ import transformers
 from huggingface_hub import login
 import spacy
 import re
+from spacy.tokens import Doc, Span
 
-login("eeee")
+#login("eeeee")
 nlp = spacy.load("en_core_web_sm")
 
 class Llama3:
@@ -51,15 +52,26 @@ class Llama3:
             if(yorn == "y"):
                 return response
     
+    def lemmasDoc(self, text, nlp):
+        doc = nlp(text)
+        
+        # Create a list of lemmatized tokens
+        lemmas = [token.lemma_ for token in doc]
+        
+        # Create a new Doc with lemmatized tokens
+        new_doc = Doc(doc.vocab, words=lemmas)
+        
+        return new_doc
+    
     def caveManModify (self):
         while True:
             words = []
             output = self.generateSentences()
-            doc = nlp(output)
+            doc = self.lemmasDoc(output, nlp)
             for token in doc:
-                if token.tag_ == "VBP" or token.tag_ == "MD":
+                if token.tag_ in ["VB", "VBP", "MD", "JJ", "JJR", "JJS"]:
                     continue
-                if token.dep_ == "det":
+                if token.dep_ in ["det", "amod"]:
                     continue
                 if token.text == "my":
                     continue
@@ -78,6 +90,80 @@ class Llama3:
             print(simpWord)
             break
 
+
+def test(text):
+    doc = lemmasDoctest(text, nlp)   
+    for token in doc:
+        print(f"Text: {token.text}\n"
+                f"Lemma: {token.lemma_}\n"
+                f"POS: {token.pos_}\n"
+                f"Tag: {token.tag_}\n"
+                f"Dep: {token.dep_}\n"
+                f"Shape: {token.shape_}\n"
+                f"Is Alpha: {token.is_alpha}\n"
+                f"Is Stop: {token.is_stop}\n"
+                f"Is Punct: {token.is_punct}\n"
+                f"Like Num: {token.like_num}\n"
+                f"Ent IOB: {token.ent_iob_}\n"
+                f"Ent Type: {token.ent_type_}\n")
+
+def lemmasDoctest(text, nlp):
+        doc = nlp(text)
+        lemmas = [token.lemma_ for token in doc]
+        simpWord = ' '.join(lemmas)
+        simpWord = re.sub(r'\s+', ' ', simpWord)
+        simpWord = re.sub(r' \.', '.', simpWord)
+        simpWord = re.sub(r' \?', '?', simpWord)
+        simpWord = re.sub(r' \,', ',', simpWord)
+        simpWord = simpWord.strip()
+        doc = nlp(simpWord)
+        return doc
+    
+def caveManModifytest ():
+    while True:
+        words = []
+        output ="""The sky was a deep shade of indigo, with clouds that seemed to be painted by a master artist. The stars twinkled like 
+diamonds scattered across the velvet expanse, and the moon glowed with a soft, gentle light. As the sun began to set, the colors of the sky 
+deepened, a fiery orange and crimson bleeding into the darkness. The air was filled with the sweet scent of blooming flowers, and the sound 
+of crickets provided a soothing background hum. As the night wore on, the stars seemed to grow brighter, and the world felt full of magic and wonder."""            
+        print(output)
+        doc = lemmasDoctest(output, nlp)
+        for token in doc:
+            if token.tag_ in ["MD", "JJR", "JJS"]:
+                continue
+            if token.dep_ in ["det"]:
+                continue
+            if token.text in ["my", "to"]:
+                continue
+            if token.pos_ == "ADJ" and token.text != token.lemma_[:len(token.text) - 1]:
+                words.append(token.text)
+                continue
+            words.append(token.lemma_)
+        word = []
+        word.append(' '.join(words).capitalize())
+        simpWord = ' '.join(word)
+        simpWord = re.sub(r'\s+', ' ', simpWord)
+        simpWord = re.sub(r' \.', '.', simpWord)
+        simpWord = re.sub(r' \?', '?', simpWord)
+        simpWord = re.sub(r' \,', ',', simpWord)
+        simpWord = simpWord.strip()
+        print(simpWord)
+        break
+
 if __name__ == "__main__":
-    bot = Llama3("meta-llama/Meta-Llama-3-8B-Instruct")
-    bot.caveManModify()
+    #bot = Llama3("meta-llama/Meta-Llama-3-8B-Instruct")
+    #bot.caveManModify()
+    caveManModifytest()
+#    test("""The sky was a deep shade of indigo, with clouds that seemed to be painted by a master artist. The stars twinkled like 
+#diamonds scattered across the velvet expanse, and the moon glowed with a soft, gentle light. As the sun began to set, the colors of the sky 
+#deepened, a fiery orange and crimson bleeding into the darkness. The air was filled with the sweet scent of blooming flowers, and the sound 
+#of crickets provided a soothing background hum. As the night wore on, the stars seemed to grow brighter, and the world felt full of magic and wonder."""            )
+   
+   
+   
+    #test("bright brighter")
+#    test( """The sky was a deep shade of indigo, with clouds that seemed to be painted by a master artist. The stars twinkled like 
+#diamonds scattered across the velvet expanse, and the moon glowed with a soft, gentle light. As the sun began to set, the colors of the sky 
+#deepened, a fiery orange and crimson bleeding into the darkness. The air was filled with the sweet scent of blooming flowers, and the sound 
+#of crickets provided a soothing background hum. As the night wore on, the stars seemed to grow brighter, and the world felt full of magic and wonder."""            )
+            
