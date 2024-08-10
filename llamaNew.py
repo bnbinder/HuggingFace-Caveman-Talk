@@ -5,7 +5,7 @@ import spacy
 import re
 from spacy.tokens import Doc, Span
 
-#login("eeeee")
+login("hhhh")
 nlp = spacy.load("en_core_web_sm")
 
 class Llama3:
@@ -54,14 +54,16 @@ class Llama3:
     
     def lemmasDoc(self, text, nlp):
         doc = nlp(text)
-        
-        # Create a list of lemmatized tokens
         lemmas = [token.lemma_ for token in doc]
-        
-        # Create a new Doc with lemmatized tokens
-        new_doc = Doc(doc.vocab, words=lemmas)
-        
-        return new_doc
+        simpWord = ' '.join(lemmas)
+        simpWord = re.sub(r'\s+', ' ', simpWord)
+        simpWord = re.sub(r' \.', '.', simpWord)
+        simpWord = re.sub(r' \?', '?', simpWord)
+        simpWord = re.sub(r' \,', ',', simpWord)
+        simpWord = re.sub(r' \'', '', simpWord)
+        simpWord = simpWord.strip()
+        doc = nlp(simpWord)
+        return doc
     
     def caveManModify (self):
         while True:
@@ -69,11 +71,11 @@ class Llama3:
             output = self.generateSentences()
             doc = self.lemmasDoc(output, nlp)
             for token in doc:
-                if token.tag_ in ["VB", "VBP", "MD", "JJ", "JJR", "JJS"]:
+                if token.tag_ in ["MD", "JJR", "JJS"]:
                     continue
-                if token.dep_ in ["det", "amod"]:
+                if token.dep_ in ["det"]:
                     continue
-                if token.text == "my":
+                if token.text in ["my", "to"]:
                     continue
                 if token.pos_ == "ADJ" and token.text != token.lemma_[:len(token.text) - 1]:
                     words.append(token.text)
@@ -85,6 +87,7 @@ class Llama3:
             simpWord = re.sub(r'\s+', ' ', simpWord)
             simpWord = re.sub(r' \.', '.', simpWord)
             simpWord = re.sub(r' \?', '?', simpWord)
+            simpWord = re.sub(r' \'', '', simpWord)
             simpWord = re.sub(r' \,', ',', simpWord)
             simpWord = simpWord.strip()
             print(simpWord)
@@ -115,6 +118,7 @@ def lemmasDoctest(text, nlp):
         simpWord = re.sub(r' \.', '.', simpWord)
         simpWord = re.sub(r' \?', '?', simpWord)
         simpWord = re.sub(r' \,', ',', simpWord)
+        simpWord = re.sub(r'\'', '', simpWord)
         simpWord = simpWord.strip()
         doc = nlp(simpWord)
         return doc
@@ -133,7 +137,7 @@ of crickets provided a soothing background hum. As the night wore on, the stars 
                 continue
             if token.dep_ in ["det"]:
                 continue
-            if token.text in ["my", "to"]:
+            if token.text in ["my", "to", "its"]:
                 continue
             if token.pos_ == "ADJ" and token.text != token.lemma_[:len(token.text) - 1]:
                 words.append(token.text)
@@ -146,14 +150,15 @@ of crickets provided a soothing background hum. As the night wore on, the stars 
         simpWord = re.sub(r' \.', '.', simpWord)
         simpWord = re.sub(r' \?', '?', simpWord)
         simpWord = re.sub(r' \,', ',', simpWord)
+        simpWord = re.sub(r'\'', '', simpWord)
         simpWord = simpWord.strip()
         print(simpWord)
         break
 
 if __name__ == "__main__":
-    #bot = Llama3("meta-llama/Meta-Llama-3-8B-Instruct")
-    #bot.caveManModify()
-    caveManModifytest()
+    bot = Llama3("meta-llama/Meta-Llama-3-8B-Instruct")
+    bot.caveManModify()
+    #caveManModifytest()
 #    test("""The sky was a deep shade of indigo, with clouds that seemed to be painted by a master artist. The stars twinkled like 
 #diamonds scattered across the velvet expanse, and the moon glowed with a soft, gentle light. As the sun began to set, the colors of the sky 
 #deepened, a fiery orange and crimson bleeding into the darkness. The air was filled with the sweet scent of blooming flowers, and the sound 
