@@ -25,19 +25,35 @@ make sure you have pip 3.12.4 or higher cuz it complains
 
 and install these libraries
 ```
+pip install textstat
+pip install sentence-transformers
+
+pip install sentencepiece
+
+pip install tensorflow
+pip install pandas
+pip install numpy
+pip install scikit-learn
+pip install matplotlib
+
 pip install spacy
 python -m spacy download en_core_web_sm
+
 pip install wheel
 pip install ninja (idk)
 pip install packaging (idk)
 pip install flash-attn --no-build-isolation (idk)
+
 pip install bitsandbytes (idk)
 pip install -U "huggingface_hub[cli]" (idk)
 pip install accelerate (if using low_cpu_mem_usage=true parameter when loading pretrained model ig????????!!! WHY CANT YOU JUST USE LITTLE MEMORY AT TIME >:(                  
 pip install transformers==4.21.0
+
 pip install datasets scikit-learn sentencepiece streamlit seqeval tensorboardx wandb psutil
 pip install SpaCy ftfy
+
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 (just get the latest one from their website, use cuda 121 since it complains otherwsie less verison)
+
 pip install simpletransformers==0.61.13 (NOT USING THIS, HERE FOR AUTHOR TO REMEMBER VERSION THAT IS SUPPOSED TO WORK!!!!!!!!!!!!!!!) 
 ```
 
