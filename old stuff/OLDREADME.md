@@ -25,6 +25,12 @@ make sure you have pip 3.12.4 or higher cuz it complains
 
 and install these libraries
 ```
+pip install rich
+
+pip install POT
+pip install rouge_score
+pip install gensim
+pip install nltk
 pip install textstat
 pip install sentence-transformers
 
