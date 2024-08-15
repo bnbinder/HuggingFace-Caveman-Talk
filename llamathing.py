@@ -19,7 +19,7 @@ import warnings
 warnings.filterwarnings('ignore', module='transformers')
 warnings.filterwarnings('ignore', module='bitsandbytes')
 
-login("hhhh")
+login("eee")
 word2vec = Word2Vec(common_texts, vector_size=100, window=5, min_count=1, workers=4)
 wordVectors = word2vec.wv
 model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -90,17 +90,21 @@ class Llama3:
     def llamaCaveman (self, text):
         response = self.getResponse("Using this paragraph of text, make this text sound like a caveman wrote it. Do not include any introduction sentence responding to my prompt, only respond with the sentences generated. So something like \"Here are five sentences in paragraph form:\" do not include: " + text)
         return response
+    
+    def cleanup (self, words):
+        t = ' '.join(words).capitalize()
+        t = re.sub(r'\s+', ' ', t)
+        t = re.sub(r' \.', '.', t)
+        t = re.sub(r' \?', '?', t)
+        t = re.sub(r' \'', '', t)
+        t = re.sub(r' \,', ',', t)
+        t = t.strip()
+        return t
         
     def lemmasDoc (self, text, nlp):
         doc = nlp(text)
         lemmas = [token.lemma_ for token in doc]
-        simpWord = ' '.join(lemmas)
-        simpWord = re.sub(r'\s+', ' ', simpWord)
-        simpWord = re.sub(r' \.', '.', simpWord)
-        simpWord = re.sub(r' \?', '?', simpWord)
-        simpWord = re.sub(r' \,', ',', simpWord)
-        simpWord = re.sub(r' \'', '', simpWord)
-        simpWord = simpWord.strip()
+        simpWord = self.cleanup(lemmas)
         doc = nlp(simpWord)
         return doc
     
@@ -125,15 +129,7 @@ class Llama3:
                 
                 words.append(token.lemma_)
                 
-            word = []
-            word.append(' '.join(words).capitalize())
-            simpWord = ' '.join(word)
-            simpWord = re.sub(r'\s+', ' ', simpWord)
-            simpWord = re.sub(r' \.', '.', simpWord)
-            simpWord = re.sub(r' \?', '?', simpWord)
-            simpWord = re.sub(r' \'', '', simpWord)
-            simpWord = re.sub(r' \,', ',', simpWord)
-            simpWord = simpWord.strip()
+            simpWord = self.cleanup(words)
             print(simpWord)
             outputT = simpWord
             break
@@ -156,15 +152,18 @@ def test (text):
         )
         
 class Similarity:
+    # encodes the texts to vectors and compares them using cosine dot product formula
     def computeSimilarity(self, text1, text2):
         embeddings1 = model.encode(text1, convert_to_tensor=True)
         embeddings2 = model.encode(text2, convert_to_tensor=True)
         similarity = util.pytorch_cos_sim(embeddings1, embeddings2)
         return similarity.item()
 
+    # uses flesch kincaid formula to compute what grade level the text is at
     def getReadability(self, text):
         return textstat.flesch_kincaid_grade(text)
-
+        
+    # uses simple method to see whether any tokens are in the complexWords token list
     def isCavemanLike(self, text):
         doc = nlp(text)
         complexWords = {"my", "to", "the", "a", "an", "was", "were", "had"}
@@ -174,6 +173,7 @@ class Similarity:
         
         return True
 
+    # compares ngrams of candidate text to ngrams of reference texts and sees if they are similar or not (using 3 ngram and smoothing function)
     def calculateBleu(self, reference, candidate):
         reference = [reference.split()]
         candidate = candidate.split()
@@ -184,8 +184,9 @@ class Similarity:
             smoothing_function = SmoothingFunction().method1
         )
 
+
     def calculateRouge(self, reference, candidate):
-        scorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
+        scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL', 'rougeLsum'], use_stemmer=True)
         scores = scorer.score(reference, candidate)
         return scores
 
@@ -225,9 +226,7 @@ of crickets provided a soothing background hum. As the night wore on, the stars 
                 words.append(token.text)
                 continue
             words.append(token.lemma_)
-        word = []
-        word.append(' '.join(words).capitalize())
-        simpWord = ' '.join(word)
+        simpWord = ' '.join(words).capitalize()
         simpWord = re.sub(r'\s+', ' ', simpWord)
         simpWord = re.sub(r' \.', '.', simpWord)
         simpWord = re.sub(r' \?', '?', simpWord)
