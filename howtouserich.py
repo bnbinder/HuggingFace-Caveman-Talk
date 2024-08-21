@@ -1,4 +1,24 @@
 from rich.console import Console
+from rich.live import Live
+from time import sleep
+
+console = Console()
+data = [1, 2, 3, 4, 5]
+
+with Live(f"Data: {data}", refresh_per_second=4) as live:
+    for i in range(10):
+        data.append(i)
+        live.update(f"Data: {data}")
+        sleep(1)
+
+
+
+
+
+
+import click
+
+from rich.console import Console
 from rich.table import Table
 
 console = Console()

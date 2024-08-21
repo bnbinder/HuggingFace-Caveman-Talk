@@ -15,41 +15,85 @@ from rouge_score import rouge_scorer
 import sys
 import os
 import warnings
+from rich.progress import track
+from time import sleep
+from rich import print
+from datetime import datetime
+from rich.progress import Progress
+from rich.console import Console
+from rich.panel import Panel
+
+def log_message(task):
+    current_time = datetime.now().strftime('%H:%M:%S')
+    log_text = f"[{current_time}] {task}"
+    print(log_text)
+    
+def log_time():
+    current_time = datetime.now().strftime('%H:%M:%S')
+    log_text = f"[{current_time}]"
+    print(log_text, end="")
 
 warnings.filterwarnings('ignore', module='transformers')
 warnings.filterwarnings('ignore', module='bitsandbytes')
 
-login("eee")
-word2vec = Word2Vec(common_texts, vector_size=100, window=5, min_count=1, workers=4)
+log_time()
+login("hhhh")
+log_message("Login To HuggingFace Account Successful")
+
+word2vec = Word2Vec(
+    common_texts, 
+    vector_size=100, 
+    window=5, 
+    min_count=1, 
+    workers=4
+    )
 wordVectors = word2vec.wv
 model = SentenceTransformer('all-MiniLM-L6-v2')
 nlp = spacy.load("en_core_web_sm")
 resultT = ""
 outputT = ""
+console = Console()
+list = [
+    "Prompt Set", 
+    "Chat Template Applied", 
+    "Output Pipeline Done", 
+    "Output Recorded"
+    ]
+console = Console()
 
 class Llama3:
     def __init__ (self, modelPath):
-        self.modelID = modelPath
+        log_time()
         self.pipeline = transformers.pipeline(
             "text-generation",
-            model = self.modelID,
+            model = modelPath,
             model_kwargs = {
                 "torch_dtype": torch.float16,
                 "quantization_config": {"load_in_4bit": True},
                 "low_cpu_mem_usage": True,
             },
         )
-        
-        self.terminator = self.pipeline.tokenizer.eos_token_id
+        log_message("Model Pipeline Loaded")        
+    
+        self.terminator = self.pipeline.tokenizer.eos_token_id   
+        log_message("Terminator Loaded")
         
     def getResponse (self, query, maxTokens = 4096, temp = 0.6, topP = 0.9):
         userPrompt = [{"role": "system", "content": ""}] + [{"role": "user", "content": query}]
+                    
+        task = list[0]
+        console.log(f"{task}")
+        
         prompt = self.pipeline.tokenizer.apply_chat_template(
             userPrompt, 
             tokenize = False, 
             add_generation_prompt = True
         )
+                    
+        task = list[1]
+        console.log(f"{task}")
         
+        print("hi", end="")
         outputs = self.pipeline(
             prompt,
             max_new_tokens = maxTokens,
@@ -58,8 +102,15 @@ class Llama3:
             temperature = temp,
             top_p = topP
         )
+                    
+        task = list[2]
+        console.log(f"{task} complete")
         
-        response = outputs[0]["generated_text"][len(prompt):]
+        response = outputs[0]["generated_text"][len(prompt):]    
+        
+        task = list[3]
+        console.log(f"{task} complete")
+        
         return response
     
     def generateSentences (self):
@@ -74,7 +125,14 @@ class Llama3:
             else:
                 response = self.getResponse("Do not include any introduction sentence responding to my prompt, only respond with the sentences generated. So something like \"Here are five sentences in paragraph form:\" do not include: " + userInput)
             
-            print("What Llama cooked up: " + response)
+            llamaCookedUp = Panel(
+                response, 
+                title="What Llama Cooked Up", 
+                expand=False
+                )
+            
+            print(llamaCookedUp)
+            
             yorn = input("Is this good (Yes/No)").lower()[0]
             
             if yorn == "y":
@@ -89,6 +147,14 @@ class Llama3:
                 
     def llamaCaveman (self, text):
         response = self.getResponse("Using this paragraph of text, make this text sound like a caveman wrote it. Do not include any introduction sentence responding to my prompt, only respond with the sentences generated. So something like \"Here are five sentences in paragraph form:\" do not include: " + text)
+        llamaCookedUp = Panel(
+                response, 
+                title="What Caveman Llama Cooked Up", 
+                expand=False
+                )
+            
+        print(llamaCookedUp)
+            
         return response
     
     def cleanup (self, words):
@@ -115,42 +181,38 @@ class Llama3:
             words = []
             output = self.generateSentences()
             doc = self.lemmasDoc(output, nlp)
+            total_tokens = len(doc) 
             
-            for token in doc:
-                if token.tag_ in ["MD", "JJR", "JJS"]:
-                    continue
-                if token.dep_ in ["det"]:
-                    continue
-                if token.text in ["my", "to"]:
-                    continue
-                if token.pos_ == "ADJ" and token.text != token.lemma_[:len(token.text) - 1]:
-                    words.append(token.text)
-                    continue
+            with Progress() as progress:
+                task = progress.add_task("Processing tokens...", total=total_tokens)
                 
-                words.append(token.lemma_)
+                for i, token in enumerate(doc, start=1):
+                    progress.update(task, advance=1, description=f"Processing tokens... [{i}/{total_tokens}]")
+                    
+                    if token.tag_ in ["MD", "JJR", "JJS"]:
+                        continue
+                    if token.dep_ in ["det"]:
+                        continue
+                    if token.text in ["my", "to"]:
+                        continue
+                    if token.pos_ == "ADJ" and token.text != token.lemma_[:len(token.text) - 1]:
+                        words.append(token.text)
+                        continue
+                    
+                    words.append(token.lemma_)
                 
             simpWord = self.cleanup(words)
-            print(simpWord)
+            iCookedUp = Panel(
+                simpWord, 
+                title="What I Cooked Up", 
+                expand=False
+                )
+            
+            print(iCookedUp)
+            
             outputT = simpWord
             break
 
-def test (text):
-    doc = lemmasDoctest(text, nlp)   
-    for token in doc:
-        print(f"Text: {token.text}\n"
-                f"Lemma: {token.lemma_}\n"
-                f"POS: {token.pos_}\n"
-                f"Tag: {token.tag_}\n"
-                f"Dep: {token.dep_}\n"
-                f"Shape: {token.shape_}\n"
-                f"Is Alpha: {token.is_alpha}\n"
-                f"Is Stop: {token.is_stop}\n"
-                f"Is Punct: {token.is_punct}\n"
-                f"Like Num: {token.like_num}\n"
-                f"Ent IOB: {token.ent_iob_}\n"
-                f"Ent Type: {token.ent_type_}\n"
-        )
-        
 class Similarity:
     # encodes the texts to vectors and compares them using cosine dot product formula
     def computeSimilarity(self, text1, text2):
@@ -192,49 +254,6 @@ class Similarity:
 
     def wordMoversDistance(self, text1, text2):
         return wordVectors.wmdistance(text1.split(), text2.split())
-
-def lemmasDoctest (text, nlp):
-        doc = nlp(text)
-        lemmas = [token.lemma_ for token in doc]
-        simpWord = ' '.join(lemmas)
-        simpWord = re.sub(r'\s+', ' ', simpWord)
-        simpWord = re.sub(r' \.', '.', simpWord)
-        simpWord = re.sub(r' \?', '?', simpWord)
-        simpWord = re.sub(r' \,', ',', simpWord)
-        simpWord = re.sub(r'\'', '', simpWord)
-        simpWord = simpWord.strip()
-        doc = nlp(simpWord)
-        return doc
-    
-def caveManModifytest ():
-    while True:
-        words = []
-        output ="""The sky was a deep shade of indigo, with clouds that seemed to be painted by a master artist. The stars twinkled like 
-diamonds scattered across the velvet expanse, and the moon glowed with a soft, gentle light. As the sun began to set, the colors of the sky 
-deepened, a fiery orange and crimson bleeding into the darkness. The air was filled with the sweet scent of blooming flowers, and the sound 
-of crickets provided a soothing background hum. As the night wore on, the stars seemed to grow brighter, and the world felt full of magic and wonder."""            
-        print(output)
-        doc = lemmasDoctest(output, nlp)
-        for token in doc:
-            if token.tag_ in ["MD", "JJR", "JJS"]:
-                continue
-            if token.dep_ in ["det"]:
-                continue
-            if token.text in ["my", "to", "its"]:
-                continue
-            if token.pos_ == "ADJ" and token.text != token.lemma_[:len(token.text) - 1]:
-                words.append(token.text)
-                continue
-            words.append(token.lemma_)
-        simpWord = ' '.join(words).capitalize()
-        simpWord = re.sub(r'\s+', ' ', simpWord)
-        simpWord = re.sub(r' \.', '.', simpWord)
-        simpWord = re.sub(r' \?', '?', simpWord)
-        simpWord = re.sub(r' \,', ',', simpWord)
-        simpWord = re.sub(r'\'', '', simpWord)
-        simpWord = simpWord.strip()
-        print(simpWord)
-        break
 
 if __name__ == "__main__":
     bot = Llama3("meta-llama/Meta-Llama-3-8B-Instruct")
