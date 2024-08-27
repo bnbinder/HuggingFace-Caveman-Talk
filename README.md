@@ -1,3 +1,5 @@
+### YOU NEED A GPU OR A BIG PHAT CPU!!! I DONT MAKE THE RULES!!!!
+
 venvs are optional, but highly recommended just in general
 <br>
 To create your virtual enviornment, open the terminal in your repository folder and enter
@@ -19,10 +21,17 @@ Make sure you have installed c++ tools from this link
 <br>
 https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
-https://developer.nvidia.com/cuda-toolkit
+https://developer.nvidia.com/cuda-toolkit <-- idk lol
 
 and install these libraries
 ```
+pip install POT
+pip install rouge_score
+pip install gensim
+pip install nltk
+pip install textstat
+pip install sentence-transformers
+pip install sentencepiece
 pip install spacy
 python -m spacy download en_core_web_sm
 pip install bitsandbytes
