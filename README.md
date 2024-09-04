@@ -1,3 +1,5 @@
+# ALMOST DONE - NEED TO FINE TUNE SOME THINGS
+<br>
 ### YOU NEED A GPU OR A BIG PHAT CPU!!! I DONT MAKE THE RULES!!!!
 
 venvs are optional, but highly recommended just in general
