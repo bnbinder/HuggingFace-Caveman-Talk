@@ -19,6 +19,8 @@ Then open the terminal in your repository folder and enter
 venv_name/Scripts/activate
 ```
 
+install?? https://nlp.stanford.edu/projects/glove/ - try the big one on the beefy computer.
+
 Make sure you have installed c++ tools from this link
 <br>
 https://visualstudio.microsoft.com/visual-cpp-build-tools/
