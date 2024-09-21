@@ -10,7 +10,9 @@ To create your virtual enviornment, open the terminal in your repository folder 
 /path/to/python.exe -m venv venv_name
 ```
 <br>
+
 For the word movers distance, install one of the gloves and extract the zip into the repository. then edit the `gloveInputFile` String in the code with the path to the glove model of your choosing
+
 <br>
 <br>
 https://nlp.stanford.edu/projects/glove/
