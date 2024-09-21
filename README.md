@@ -1,7 +1,3 @@
-# ALMOST DONE - NEED TO FINE TUNE SOME THINGS
-<br>
-### YOU NEED A GPU OR A BIG PHAT CPU!!! I DONT MAKE THE RULES!!!!
-
 venvs are optional, but highly recommended just in general
 <br>
 To create your virtual enviornment, open the terminal in your repository folder and enter
@@ -27,22 +23,11 @@ https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 https://developer.nvidia.com/cuda-toolkit <-- idk lol
 
-and install these libraries
+run the `requirements.txt` file
+
+and run this command to install the spacy english language model
 ```
-pip install POT
-pip install rouge_score
-pip install gensim
-pip install nltk
-pip install textstat
-pip install sentence-transformers
-pip install sentencepiece
-pip install spacy
 python -m spacy download en_core_web_sm
-pip install bitsandbytes
-pip install -U "huggingface_hub[cli]"
-pip install accelerate
-pip install transformers
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
 Once your done running your code, run this in a terminal inside your repository folder

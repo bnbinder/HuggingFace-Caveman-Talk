@@ -1,0 +1,13 @@
+POT
+rouge-score
+gensim
+nltk
+textstat
+sentence-transformers
+sentencepiece
+spacy
+bitsandbytes
+huggingface_hub[cli]
+accelerate
+transformers
+torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121

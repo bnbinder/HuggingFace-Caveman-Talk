@@ -2,26 +2,25 @@ import torch
 import transformers
 from huggingface_hub import login
 import spacy
-from spacy.tokens import Doc, Span
 import re
 from sentence_transformers import SentenceTransformer, util
 import textstat
 from gensim.models import KeyedVectors
-from gensim.test.utils import common_texts, get_tmpfile
+from gensim.test.utils import common_texts
 from gensim.models import Word2Vec
-import nltk
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
-import sys
-import os
 import warnings
-from rich.progress import track
-from time import sleep
-from rich import print
 from datetime import datetime
+from rich import print
 from rich.progress import Progress
 from rich.console import Console
 from rich.panel import Panel
+from rich.table import Table
+from rich import box
+
+gloveInputFile = "glove.twitter.27B/glove.twitter.27B.200d.txt"
+huggingfaceCode = "PUT YOUR CODE HERE (for example you would put something like hf_njgrebgreihgbeh)"
 
 def log_message(task):
     current_time = datetime.now().strftime('%H:%M:%S')
@@ -37,22 +36,14 @@ warnings.filterwarnings('ignore', module='transformers')
 warnings.filterwarnings('ignore', module='bitsandbytes')
 
 log_time()
-login("eee")
+login(huggingfaceCode)
 log_message("Login To HuggingFace Account Successful")
 
-word2vec = Word2Vec(
-    common_texts, 
-    vector_size=100, 
-    window=5, 
-    min_count=1, 
-    workers=4
-)
-wordVectors = word2vec.wv
+wordVectors = KeyedVectors.load_word2vec_format(gloveInputFile, binary = False, no_header=True)
 model = SentenceTransformer('all-MiniLM-L6-v2')
 nlp = spacy.load("en_core_web_sm")
 resultT = ""
 outputT = ""
-console = Console()
 list = [
     "Prompt Set", 
     "Chat Template Applied", 
@@ -63,13 +54,13 @@ console = Console()
 
 class Llama3:
     def __init__ (self, modelPath):
-
         log_time()
-        device = 0 if torch.cuda.is_available() else -1
+        
+        #device = 0 if torch.cuda.is_available() else -1
         self.pipeline = transformers.pipeline(
             "text-generation",
             model = modelPath,
-            device = device,
+            #device = device,
             model_kwargs = {
                 "torch_dtype": torch.float16,
                 "quantization_config": {"load_in_4bit": True},
@@ -96,7 +87,7 @@ class Llama3:
         task = list[1]
         console.log(f"{task}")
         
-        print("hi", end="")
+        print(f"{datetime.now().strftime('%H:%M:%S')}", end="")
         outputs = self.pipeline(
             prompt,
             max_new_tokens = maxTokens,
@@ -120,14 +111,10 @@ class Llama3:
         global resultT
         
         while True:
-            userInput = input("Ask the AI to write something or write \"theme\" and a theme after for it to generate some sentences based on the theme: ")
+            userInput = input("Ask the AI to write something, fo examples, say \"Write five sentences about a blue tiger\" for it to generate some sentences based on the theme: ")
             log_message("Input Recieved")
-            response = ""
             
-            if userInput.lower().replace("\"", "")[:5] == "theme":
-                response = self.getResponse("Using this theme, generate at least five sentences in paragraph form. Do not include any introduction sentence responding to my prompt, only respond with the sentences generated. So something like \"Here are five sentences in paragraph form:\" do not include: " + userInput)
-            else:
-                response = self.getResponse("Do not include any introduction sentence responding to my prompt, only respond with the sentences generated. So something like \"Here are five sentences in paragraph form:\" do not include: " + userInput)
+            response = self.getResponse("Do not include any introduction sentence responding to my prompt, only respond with the sentences generated. So something like \"Here are five sentences in paragraph form:\" do not include: " + userInput)
 
             llamaCookedUp = Panel(
                 response, 
@@ -234,7 +221,7 @@ class Similarity:
 
     # uses flesch kincaid formula to compute what grade level the text is at
     def getReadability(self, text):
-        log_message("Similarity Using Kincaid Method Done")
+        log_message("Level Of Sophistication Using Kincaid Method Done")
 
         return textstat.flesch_kincaid_grade(text)
         
@@ -244,10 +231,10 @@ class Similarity:
         complexWords = {"my", "to", "the", "a", "an", "was", "were", "had"}
 
         if any(token.text.lower() in complexWords for token in doc):
-            log_message("Similarity Using Simple Method Done")
+            log_message("Level Of Sophistication Using Simple Method Done")
             return False
 
-        log_message("Similarity Using Simple Method Done")
+        log_message("Level Of Sophistication Using Simple Method Done")
 
         return True
 
@@ -272,6 +259,7 @@ class Similarity:
         log_message("Similarity Using Rouge Method Done")
         return scores
 
+    #compares texts using pre trained word vector model. measures minimum distance or cost required to transform the words of one text into another by moving the words in the vector space
     def wordMoversDistance(self, text1, text2):
         wordScore = wordVectors.wmdistance(text1.split(), text2.split())
         log_message("Similarity Using WMD Done")
@@ -310,3 +298,25 @@ if __name__ == "__main__":
     distanceRG = sim.wordMoversDistance(referenceText, generatedText)
     distanceRB = sim.wordMoversDistance(referenceText, betterGeneratedText)
     distanceGB = sim.wordMoversDistance(betterGeneratedText, generatedText)
+    
+    tableSingle = Table(show_header=True, header_style="bold magenta", box=box.SQUARE)
+    tableSingle.add_column("Method")
+    tableSingle.add_column("Original Text")
+    tableSingle.add_column("My Method Text")
+    tableSingle.add_column("Better Generated Text")
+    tableSingle.add_row("Kincaid", str(referenceScore), str(generatedScore), str(betterScore))
+    tableSingle.add_row("Rulset", str(referenceCheck), str(generatedCheck), str(betterCheck))
+    
+    console.print(tableSingle)
+    
+    tablePair = Table(show_header=True, header_style="bold magenta", box=box.SQUARE)
+    tablePair.add_column("Method")
+    tablePair.add_column("Original Text and Generated Text")
+    tablePair.add_column("Original Text and Better Text")
+    tablePair.add_column("Generated Text and Better Text")
+    tablePair.add_row("Encoding", str(similarityScoreRG), str(similarityScoreRB), str(similarityScoreGB))
+    tablePair.add_row("Bleu", str(bleuScoreRG), str(bleuScoreRB), str(bleuScoreGB))
+    tablePair.add_row("Rouge", str(rougeScoresRG), str(rougeScoresRB), str(rougeScoresGB))
+    tablePair.add_row("WMD", str(distanceRG), str(distanceRB), str(distanceGB))
+
+    console.print(tablePair)
