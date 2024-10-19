@@ -12,7 +12,6 @@ To create your virtual enviornment, open the terminal in your repository folder 
 <br>
 
 For the word movers distance, install one of the gloves and extract the zip into the repository. then edit the `gloveInputFile` String in the code with the path to the glove model of your choosing
-
 <br>
 <br>
 https://nlp.stanford.edu/projects/glove/
@@ -39,26 +38,27 @@ python -m spacy download en_core_web_sm
 ```
 
 # Running The Code
-Open an admin access terminal and run this code so you can activate the virtual enviornment
+- Open an admin access terminal and run this code so you can activate the virtual enviornment
 ```
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 ```
 
-Then open the terminal in your repository folder and enter
+- Then open the terminal in your repository folder and enter
 ```
 venv_name/Scripts/activate
 ```
 <br>
-Run the python file like usual, and follow the directions
-<br>
+
+- Run the `llamathing.py` python file like usual, and follow the directions
+
 <br>
 
-Once your done running your code, run this in a terminal inside your repository folder
+- Once your done running your code, run this in a terminal inside your repository folder
 ```
 venv_name/Scripts/deactivate
 ```
 
-And run this in an admin access terminal
+- And run this in an admin access terminal
 ```
 Set-ExecutionPolicy -ExecutionPolicy Undefined
 ```
