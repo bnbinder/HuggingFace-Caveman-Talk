@@ -1,5 +1,5 @@
 # What Is This
-to get a better understanding and introduction to NLP, decided to do a pet project about it. You need a gpu to run this, since the glove and llama model need one to function.
+to get a better understanding and introduction to NLP, decided to do a pet project about it. You need a gpu to run this, since the glove and llama model need one to function. It takes in regular text, and transforms it into caveman text. It uses a brute force method I made, and generated text from llama. It then produces whether the original text is similar / more caveman like.
 
 # What To Install
 venvs are optional, but highly recommended just in general
